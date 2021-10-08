@@ -1,0 +1,23 @@
+os: linux
+dist: bionic
+language: java
+jdk: openjdk11
+cache:
+  directories:
+  - "$HOME/.m2"
+addons:
+  sonarcloud:
+    organization: molgenis
+    token:
+      secure: pMEcB5dESQ5wAgOq2HuUl0RFmSEE2xLdcp9iz142cEV4Q0l0cU3k36oBUA7Jt+lwPJZC75KtA33xxr+48NWOmEdbP8jaHv8ac5iD8z3Y0bzZMJrz0wqAIy9+hSj6gK2huYI42JWoWeg1YBbvufMp45dUWNteUb43IZ9OlmY5nUj88xt2Wc7Q3duRH29uUzkBJKbKCUGDRV9nzogYDwaEayN6iElRt77cM2zGyPoqPQxW6G0pSS3ULcJ2qKrfWqOKCDofV6AbCj6QNLPiw5r/FFOIKZ6DdkvbMRg0sKOI3Gk7BieqGXCRrXzY0cwnuH4ihxdMqndddg9vy6rvDfyMuYNipQbQBVP3aV75BsZO6cDEz+qrW1wrQrtvPH6OwX7D6gZQzKyX5RhDolEdfPLfG5Ybu9jTWHwqtNt1RcmwuuZLYGKv5TPTX8Aa2S3TgG9/1IzR8X/fNLg5qHTE1LL70pATQKJZPt5ZYfdjkCcaSxUygJT5XELio8184fTb5vwWjJz2eMopnX2q8AHBGk5fVI9xI+oR4lb44yo5LwdGYypDUmVHG4RNdAIb67rEwF4fKSZQ29p2++6qVvDh3a2OVR1phbEYBxmeqafj6a1sysQ5yCkQPi6krpZ83V704Ls2turBiQzF08RaGEgpcJGjCNg8UszJ/yJmfmoYfwpOjSo=
+script:
+- mvn clean install sonar:sonar -Pcoverage -Dsonar.projectKey=molgenis_tsv-vcf-converter
+deploy:
+  provider: releases
+  token:
+    secure: d6ufnNhjDfEUP63ReZa9YXFjXP3JNZIcxZLvCaK935ZiQKdzbZjCK+h2b+QoPjy6EdDdto5JL1mSyD6J5GHLWHNnjCIO4sDEv+sh9GWLDjYIV1LJN/NdW2SsPbCtaRpOQobvXWxdSIYuF6v8hJX1vQRXp8nB/7PXneGnYauXBv4nO1CUYIn+41qYVNxCZ/+OGdcwcB8EUPa4o72YKer2TnJ2V599HTCs/LbqjUBFnUVGOe5kietSdIYCD9S5/iZqeXCNg3SxnJbdWjmWg2pVyWvrXI8d6cjJJBp4Pt/NX7M/xncj2BCUpKZBQw/ZNLKTXVZFzup46gmHOj38w3I98F7yZyygj43i1I40rW24u9qQmNIuHwBCKR70cAxQd54Yg2WB7zbMr9pHj7m9EDfnj3ixq2Fpgv0QrTwax5SJQNAGNPxoPDoirdQSyk3OoY8zjpAOI2oaBLDxGfG1vCuI0Ssj4KNcbAlHM4cvdni8NZttxPMZ+SFcR4DEmvuZTmrZGk6MxhFz+iSThh8M9l9nGlvOEZAP5neL+efhzExmjhYTdaxXmty6wBFwKA46Yli/0YbXabxfeioJ+C//+bV20a8Z00s2SoN4okmrb8PkfiCZZ6dvHI1eod9EX4NoEhzWhstiBrQslrwW7Tc6cdY8VuoGh1f9dlS8PszjMajQkRw=
+  file: target/tsv-vcf-converter.jar
+  prerelease: true
+  on:
+    tags: true
+  edge: true
