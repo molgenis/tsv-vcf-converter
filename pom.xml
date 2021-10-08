@@ -141,7 +141,7 @@
   </dependencies>
 
   <build>
-    <finalName>vip-tsv-vcf-converter</finalName>
+    <finalName>tsv-vcf-converter</finalName>
 
     <plugins>
       <plugin>
