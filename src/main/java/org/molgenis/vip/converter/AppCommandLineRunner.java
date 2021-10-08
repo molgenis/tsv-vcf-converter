@@ -7,30 +7,31 @@ import static org.molgenis.vip.converter.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vip.converter.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vip.converter.AppCommandLineOptions.OPT_MAPPINGS;
 import static org.molgenis.vip.converter.AppCommandLineOptions.OPT_OUTPUT;
+import static org.molgenis.vip.converter.model.Constants.ALT;
+import static org.molgenis.vip.converter.model.Constants.CHROM;
+import static org.molgenis.vip.converter.model.Constants.POS;
+import static org.molgenis.vip.converter.model.Constants.REF;
+import static org.molgenis.vip.converter.model.Constants.TSV;
+import static org.molgenis.vip.converter.model.Constants.TSV_GZ;
+import static org.molgenis.vip.converter.model.Constants.VCF;
 
 import ch.qos.logback.classic.Level;
-import com.opencsv.CSVWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
+import org.molgenis.vip.converter.model.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +45,7 @@ class AppCommandLineRunner implements CommandLineRunner {
 
   private static final int STATUS_MISC_ERROR = 1;
   private static final int STATUS_COMMAND_LINE_USAGE_ERROR = 64;
+  public static final String KEY_VALUE_PATTERN = "(\\w+)=(.*?)(?=,\\w+=|$)";
 
   private final String appName;
   private final String appVersion;
@@ -81,13 +83,12 @@ class AppCommandLineRunner implements CommandLineRunner {
     AppCommandLineOptions.validateCommandLine(commandLine);
     Settings settings = mapSettings(commandLine);
     try {
-      if (settings.getInput().endsWith("tsv")) {
-        VariantContextWriter writer = createVcfWriter(settings);
-        Tsv2VcfConverter tsv2VcfConverter = new Tsv2VcfConverter(writer);
+      if (settings.getInput().toString().endsWith(TSV) || settings.getInput().toString().endsWith(
+          TSV_GZ)) {
+        Tsv2VcfConverter tsv2VcfConverter = new Tsv2VcfConverter();
         tsv2VcfConverter.convert(settings);
       } else {
-        CSVWriter writer = createCsvWriter(settings);
-        Vcf2TsvConverter vcf2TsvConverter = new Vcf2TsvConverter(writer);
+        Vcf2TsvConverter vcf2TsvConverter = new Vcf2TsvConverter();
         vcf2TsvConverter.convert(settings);
       }
     } catch (Exception e) {
@@ -96,46 +97,22 @@ class AppCommandLineRunner implements CommandLineRunner {
     }
   }
 
-  private CSVWriter createCsvWriter(Settings settings) {
-    CSVWriter csvWriter = null;
-    try {
-      csvWriter = new CSVWriter(new FileWriter(settings.getOutput().toFile()), '\t',
-          CSVWriter.NO_QUOTE_CHARACTER,
-          CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-          CSVWriter.DEFAULT_LINE_END);
-    } catch (FileNotFoundException fileNotFoundException) {
-      fileNotFoundException.printStackTrace();
-    } catch (IOException ioException) {
-      ioException.printStackTrace();
-    }
-    return csvWriter;
-  }
-
-  private static VariantContextWriter createVcfWriter(Settings settings) {
-    Path outputVcfPath = settings.getOutput();
-    if (settings.isOverwrite()) {
-      try {
-        Files.deleteIfExists(outputVcfPath);
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    } else if (Files.exists(outputVcfPath)) {
-      throw new IllegalArgumentException(
-          format("cannot create '%s' because it already exists.", outputVcfPath));
-    }
-
-    return new VariantContextWriterBuilder()
-        .clearOptions()
-        .setOutputFile(outputVcfPath.toFile())
-        .build();
-  }
 
   private Settings mapSettings(CommandLine commandLine) {
     String inputPathValue = commandLine.getOptionValue(OPT_INPUT);
     Path inputPath = Path.of(inputPathValue);
     String mappingValue = commandLine.getOptionValue(OPT_MAPPINGS);
     Map<String, String> mappings = mapMappings(mappingValue);
-    Path outputPath = Path.of(commandLine.getOptionValue(OPT_OUTPUT));
+    Path outputPath;
+    if (commandLine.hasOption(OPT_OUTPUT)) {
+      outputPath = Path.of(commandLine.getOptionValue(OPT_OUTPUT));
+    } else {
+      if (inputPath.endsWith(TSV) || inputPath.endsWith(TSV_GZ)) {
+        outputPath = Path.of(inputPath.toString().replace(TSV, VCF));
+      } else {
+        outputPath = Path.of(inputPath.toString().replace(VCF, TSV));
+      }
+    }
     boolean overwriteOutput = commandLine.hasOption(OPT_FORCE);
 
     boolean debugMode = commandLine.hasOption(OPT_DEBUG);
@@ -151,13 +128,14 @@ class AppCommandLineRunner implements CommandLineRunner {
 
   private Map<String, String> mapMappings(String mappingValue) {
     Map<String, String> attr = new HashMap<>();
-    Matcher m = Pattern.compile("(\\w+)=(.*?)(?=,\\w+=|$)").matcher(mappingValue);
+    Matcher m = Pattern.compile(KEY_VALUE_PATTERN).matcher(mappingValue);
     while (m.find()) {
       attr.put(m.group(1), m.group(2));
     }
 
-    if(!attr.containsKey("CHROM") ||!attr.containsKey("POS") ||!attr.containsKey("REF") ||!attr.containsKey("ALT")){
-      throw new RuntimeException("Mapping should contain values for at least CHROM, POS, REF and ALT");
+    if (!attr.containsKey(CHROM) || !attr.containsKey(POS) || !attr.containsKey(REF) || !attr
+        .containsKey(ALT)) {
+      throw new MappingException();
     }
 
     return attr;
