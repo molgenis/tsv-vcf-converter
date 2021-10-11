@@ -1,3 +1,3 @@
 chromosome	start	stop	ref	alt	gene	nr_labs	test	lab	lab2	lab3	lab4	lab5	lab6	lab7	consensus	type
-X	12345	12345	C	T	TEST1	1		likelyAlien							likelyAlien	total_confusion
-MT	12344	12345	CA	T	TEST2	1		likelyAlien							likelyAlien	total_confusion
+X	12345	12345	C	T	TEST1	1		likely Alien							likely Alien	total_confusion
+MT	12344	12345	CA	T	TEST2	1		likely Alien							likely Alien	total_confusion

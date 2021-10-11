@@ -1,15 +1,11 @@
 package org.molgenis.vip.converter;
 
 import static java.lang.String.format;
-import static org.molgenis.vip.converter.model.Constants.ALT;
-import static org.molgenis.vip.converter.model.Constants.CHROM;
 import static org.molgenis.vip.converter.model.Constants.INFO_DELIMITER;
 import static org.molgenis.vip.converter.model.Constants.LENGTH_ATTR;
 import static org.molgenis.vip.converter.model.Constants.LENGTH_DESC;
 import static org.molgenis.vip.converter.model.Constants.LINE_ATTR;
-import static org.molgenis.vip.converter.model.Constants.POS;
-import static org.molgenis.vip.converter.model.Constants.REF;
-import static org.molgenis.vip.converter.model.Constants.STOP;
+import static org.molgenis.vip.converter.model.Constants.TSV_GZ;
 import static org.molgenis.vip.converter.model.Constants.VCF_GZ;
 
 import com.opencsv.CSVParser;
@@ -33,6 +29,9 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import org.molgenis.vip.converter.model.Mapping;
 import org.molgenis.vip.converter.model.Settings;
@@ -41,7 +40,7 @@ public class Tsv2VcfConverter {
 
   public void convert(Settings settings) {
 
-    boolean isZipped = settings.getInput().endsWith(VCF_GZ);
+    boolean isZipped = settings.getInput().toString().endsWith(TSV_GZ);
     try (InputStreamReader inputStreamReader = getInputStreamReader(settings.getInput(), isZipped);
         VariantContextWriter writer = createVcfWriter(settings)) {
 
@@ -73,11 +72,11 @@ public class Tsv2VcfConverter {
     }
   }
 
-
-
   VariantContext createVariantContext(Mapping mapping, String[] line) {
     VariantContextBuilder builder = new VariantContextBuilder();
     int pos = Integer.valueOf(line[mapping.getPosIdx()]);
+    String ref = line[mapping.getRefIdx()];
+    String alt = line[mapping.getAltIdx()];
 
     builder.chr(line[mapping.getChromIdx()]);
     builder.start(pos);
@@ -86,10 +85,13 @@ public class Tsv2VcfConverter {
       builder
           .attribute(LENGTH_ATTR, Integer.valueOf(line[mapping.getStopIdx()]) - pos);
     }else{
-      builder.stop(pos);
+      builder.stop(pos + ref.length() -1);
     }
-    builder.alleles(line[mapping.getRefIdx()], line[mapping.getAltIdx()]);
-    builder.attribute(LINE_ATTR, line);
+    builder.alleles(ref, alt);
+    List<String> encoded = Arrays.asList(line).stream().map(value -> value.replace(" ","%s")).collect(
+        Collectors.toList());
+
+    builder.attribute(LINE_ATTR, encoded);
     return builder.make();
   }
 

@@ -15,7 +15,7 @@ class Tsv2VcfConverterTest {
   @Test
   void createVariantContext() {
     Tsv2VcfConverter tsv2VcfConverter = new Tsv2VcfConverter();
-    String[] line = new String[]{"MT","2","A","other","other","CC","3"};
+    String[] line = new String[]{"MT","2","A","other thing","other","CC","3"};
     Mapping mapping = Mapping.builder().chromIdx(0).posIdx(1).refIdx(5).altIdx(2).stopIdx(6).build();
 
     VariantContextBuilder builder = new VariantContextBuilder();
@@ -28,6 +28,6 @@ class Tsv2VcfConverterTest {
     VariantContext expected = builder.make();
 
     //toString because VariantContext lacks an equals method.
-    assertEquals(expected.toString(), tsv2VcfConverter.createVariantContext(mapping, line).toString());
+    assertEquals("[MT, 2, A, other%sthing, other, CC, 3]", tsv2VcfConverter.createVariantContext(mapping, line).getAttributeAsString(LINE_ATTR,""));
   }
 }

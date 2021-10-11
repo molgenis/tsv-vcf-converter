@@ -72,8 +72,9 @@ public class Vcf2TsvConverter {
 
   String[] parseLine(boolean isLengthPresent, VariantContext variantContext, Mapping mapping) {
     List<String> lineValue = variantContext.getAttributeAsStringList(LINE_ATTR, "");
-
-    String[] line = lineValue.toArray(String[]::new);
+    List<String> decoded = lineValue.stream().map(value -> value.replace("%s", " "))
+        .collect(Collectors.toList());
+    String[] line = decoded.toArray(String[]::new);
     line[mapping.getChromIdx()] = variantContext.getContig();
     line[mapping.getPosIdx()] = String.valueOf(variantContext.getStart());
     line[mapping.getRefIdx()] = variantContext.getReference().getBaseString();

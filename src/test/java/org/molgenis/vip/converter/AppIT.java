@@ -54,16 +54,16 @@ public class AppIT {
 
   @Test
   void testGzInput() throws IOException {
-    String inputFile = ResourceUtils.getFile("classpath:example.vcf.gz").toString();
+    String inputFile = ResourceUtils.getFile("classpath:example.tsv.gz").toString();
     String mapping = "CHROM=chromosome,POS=start,STOP=stop,REF=ref,ALT=alt";
-    String outputFile = sharedTempDir.resolve("actual.tsv").toString();
+    String outputFile = sharedTempDir.resolve("actual.vcf").toString();
 
     String[] args = {"-i", inputFile, "-m", mapping, "-o", outputFile};
     SpringApplication.run(App.class, args);
 
     String actual = Files.readString(Path.of(outputFile));
 
-    Path expectedOutputFile = ResourceUtils.getFile("classpath:example.tsv").toPath();
+    Path expectedOutputFile = ResourceUtils.getFile("classpath:example.vcf").toPath();
     String expected = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
 
     assertEquals(expected, actual);

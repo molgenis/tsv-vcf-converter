@@ -19,8 +19,13 @@ Process finished with exit code 64
 ##Example:
 ```-i /path/to/test.tsv -m "CHROM=chromosome,POS=start,STOP=stop,REF=ref,ALT=alt" -o /path/to/test.vcf.gz -f```
 
+##Spaces
+Please note that spaces are converted to %s and back during the process, so files containing %s as a value migth result in unexpected results.
+
 ##Mapping:
 Comma separated list of key value pairs where the key is one of the fields below, and the value de header value in your file.
+
+This tool has not been tested wit structural variation.
 
 Required columns: CHROM, POS, REF, ALT
 Optional column: STOP

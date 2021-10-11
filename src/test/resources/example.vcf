@@ -2,5 +2,5 @@
 ##INFO=<ID=LENGTH,Number=1,Type=String,Description="Stop minus start position">
 ##INFO=<ID=LINE,Number=1,Type=String,Description="chromosome,start,stop,ref,alt,gene,nr_labs,test,lab,lab2,lab3,lab4,lab5,lab6,lab7,consensus,type">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-X	12345	.	C	T	.	.	LENGTH=0;LINE=X,12345,12345,C,T,TEST1,1,,likelyAlien,,,,,,,likelyAlien,total_confusion
-MT	12344	.	CA	T	.	.	LENGTH=1;LINE=MT,12344,12345,CA,T,TEST2,1,,likelyAlien,,,,,,,likelyAlien,total_confusion
+X	12345	.	C	T	.	.	LENGTH=0;LINE=X,12345,12345,C,T,TEST1,1,,likely%sAlien,,,,,,,likely%sAlien,total_confusion
+MT	12344	.	CA	T	.	.	LENGTH=1;LINE=MT,12344,12345,CA,T,TEST2,1,,likely%sAlien,,,,,,,likely%sAlien,total_confusion
