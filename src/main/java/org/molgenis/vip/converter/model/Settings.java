@@ -1,4 +1,4 @@
-package org.molgenis.vip.converter;
+package org.molgenis.vip.converter.model;
 
 import java.nio.file.Path;
 import java.util.Map;
