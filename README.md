@@ -1,5 +1,9 @@
 # TSV VCF Converter
 
+##Disclaimer:
+This tool was created to facilitate liftover of tsv resources. 
+It does very little in respect to special characters, and is not suitable to convert any and all TSV and VCF files.
+
 ##Usage:
 ```
 usage: java -jar vip-tsv-vcf-converter.jar -i <arg> -m <arg> -o <arg> [-f]
