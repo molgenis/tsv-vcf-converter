@@ -13,7 +13,7 @@
 
   <groupId>org.molgenis</groupId>
   <artifactId>tsv-vcf-converter</artifactId>
-  <version>1.1.0</version>
+  <version>1.0.0</version>
 
   <name>tsv-vcf-converter</name>
   <description>Tool to submit convert tsv to vcf and vice versa, written to support liftover of variant files.</description>
