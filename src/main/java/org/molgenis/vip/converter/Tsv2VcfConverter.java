@@ -73,7 +73,7 @@ public class Tsv2VcfConverter {
 
   VariantContext createVariantContext(Mapping mapping, String[] line) {
     VariantContextBuilder builder = new VariantContextBuilder();
-    int pos = Integer.valueOf(line[mapping.getPosIdx()]);
+    int pos = Integer.parseInt(line[mapping.getPosIdx()]);
     String ref = line[mapping.getRefIdx()];
     String alt = line[mapping.getAltIdx()];
 
@@ -84,10 +84,10 @@ public class Tsv2VcfConverter {
       builder
           .attribute(LENGTH_ATTR, Integer.valueOf(line[mapping.getStopIdx()]) - pos);
     } else {
-      builder.stop(pos + ref.length() - 1);
+      builder.stop(pos + ref.length() - 1l);
     }
     builder.alleles(ref, alt);
-    List<String> encoded = Arrays.asList(line).stream().map(value -> escape(value)).collect(
+    List<String> encoded = Arrays.asList(line).stream().map(this::escape).collect(
         Collectors.toList());
 
     builder.attribute(LINE_ATTR, encoded);

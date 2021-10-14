@@ -16,11 +16,6 @@ import static org.molgenis.vip.converter.model.Constants.TSV_GZ;
 import static org.molgenis.vip.converter.model.Constants.VCF;
 
 import ch.qos.logback.classic.Level;
-import htsjdk.variant.variantcontext.writer.VariantContextWriter;
-import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
