@@ -72,7 +72,7 @@ public class Vcf2TsvConverter {
 
   String[] parseLine(boolean isLengthPresent, VariantContext variantContext, Mapping mapping) {
     List<String> lineValue = variantContext.getAttributeAsStringList(LINE_ATTR, "");
-    List<String> decoded = lineValue.stream().map(value -> value.replace("%s", " "))
+    List<String> decoded = lineValue.stream().map(value -> unEscape(value))
         .collect(Collectors.toList());
     String[] line = decoded.toArray(String[]::new);
     line[mapping.getChromIdx()] = variantContext.getContig();
@@ -88,5 +88,13 @@ public class Vcf2TsvConverter {
       line[mapping.getStopIdx()] = String.valueOf(variantContext.getStart() + length);
     }
     return line;
+  }
+
+  private String unEscape(String value) {
+    return value
+        .replace("%20", " ")
+        .replace("%2C", ",")
+        .replace("%3B", ";")
+        .replace("%3D", "=");
   }
 }
