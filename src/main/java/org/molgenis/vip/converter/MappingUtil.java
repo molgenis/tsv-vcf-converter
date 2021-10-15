@@ -26,7 +26,6 @@ public class MappingUtil {
     if (mappingMap.containsKey(STOP)) {
       stopIdx = headerList.indexOf(mappingMap.get(STOP));
     }
-    Mapping mapping = Mapping.builder().chromIdx(chromIdx).posIdx(posIdx).refIdx(refIdx).altIdx(altIdx).stopIdx(stopIdx).build();
-    return mapping;
+    return Mapping.builder().chromIdx(chromIdx).posIdx(posIdx).refIdx(refIdx).altIdx(altIdx).stopIdx(stopIdx).build();
   }
 }

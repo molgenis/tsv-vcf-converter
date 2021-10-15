@@ -6,7 +6,6 @@ import static org.molgenis.vip.converter.model.Constants.LENGTH_ATTR;
 import static org.molgenis.vip.converter.model.Constants.LENGTH_DESC;
 import static org.molgenis.vip.converter.model.Constants.LINE_ATTR;
 import static org.molgenis.vip.converter.model.Constants.TSV_GZ;
-import static org.molgenis.vip.converter.model.Constants.VCF_GZ;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -74,7 +73,7 @@ public class Tsv2VcfConverter {
 
   VariantContext createVariantContext(Mapping mapping, String[] line) {
     VariantContextBuilder builder = new VariantContextBuilder();
-    int pos = Integer.valueOf(line[mapping.getPosIdx()]);
+    int pos = Integer.parseInt(line[mapping.getPosIdx()]);
     String ref = line[mapping.getRefIdx()];
     String alt = line[mapping.getAltIdx()];
 
@@ -84,28 +83,37 @@ public class Tsv2VcfConverter {
       builder.stop(Integer.valueOf(line[mapping.getStopIdx()]));
       builder
           .attribute(LENGTH_ATTR, Integer.valueOf(line[mapping.getStopIdx()]) - pos);
-    }else{
-      builder.stop(pos + ref.length() -1);
+    } else {
+      builder.stop(pos + ref.length() - 1l);
     }
     builder.alleles(ref, alt);
-    List<String> encoded = Arrays.asList(line).stream().map(value -> value.replace(" ","%s")).collect(
+    List<String> encoded = Arrays.asList(line).stream().map(this::escape).collect(
         Collectors.toList());
 
     builder.attribute(LINE_ATTR, encoded);
     return builder.make();
   }
 
+  private String escape(String value) {
+    return value
+        .replace(" ", "%20")
+        .replace(",", "%2C")
+        .replace(";", "%3B")
+        .replace("=", "%3D");
+  }
+
   private InputStreamReader getInputStreamReader(Path input, boolean isZipped) throws IOException {
     InputStream inputStream;
-    if(isZipped){
+    if (isZipped) {
       inputStream = new GZIPInputStream(new FileInputStream(input.toFile()));
-    }else{
+    } else {
       inputStream = new FileInputStream(input.toFile());
     }
     return new InputStreamReader(inputStream);
   }
 
-  private void writeHeader(String[] headerLine, boolean isWriteLength, VariantContextWriter writer) {
+  private void writeHeader(String[] headerLine, boolean isWriteLength,
+      VariantContextWriter writer) {
     VCFHeader header = new VCFHeader();
     header.setVCFHeaderVersion(VCFHeaderVersion.VCF4_2);
     header.addMetaDataLine(

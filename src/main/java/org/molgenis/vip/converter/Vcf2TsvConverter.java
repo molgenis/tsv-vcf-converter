@@ -1,11 +1,11 @@
 package org.molgenis.vip.converter;
 
+import static com.opencsv.ICSVWriter.NO_QUOTE_CHARACTER;
 import static org.molgenis.vip.converter.model.Constants.LENGTH_ATTR;
 import static org.molgenis.vip.converter.model.Constants.LINE_ATTR;
 import static org.molgenis.vip.converter.model.Constants.TAB;
 import static org.molgenis.vip.converter.model.Constants.TSV_GZ;
 
-import com.opencsv.CSVWriter;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import htsjdk.variant.variantcontext.Allele;
@@ -37,13 +37,13 @@ public class Vcf2TsvConverter {
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
             Writer fileWriter = new OutputStreamWriter(gzipOutputStream)) {
           csvWriter = new CSVWriterBuilder(fileWriter).withSeparator(TAB)
-              .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER).build();
+              .withQuoteChar(NO_QUOTE_CHARACTER).build();
           processFile(vcfFileReader, csvWriter, settings.getMappings());
         }
       } else {
         try (Writer fileWriter = new FileWriter(settings.getOutput().toFile())) {
           csvWriter = new CSVWriterBuilder(fileWriter).withSeparator(TAB)
-              .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER).build();
+              .withQuoteChar(NO_QUOTE_CHARACTER).build();
           processFile(vcfFileReader, csvWriter, settings.getMappings());
         }
       }
@@ -72,7 +72,7 @@ public class Vcf2TsvConverter {
 
   String[] parseLine(boolean isLengthPresent, VariantContext variantContext, Mapping mapping) {
     List<String> lineValue = variantContext.getAttributeAsStringList(LINE_ATTR, "");
-    List<String> decoded = lineValue.stream().map(value -> value.replace("%s", " "))
+    List<String> decoded = lineValue.stream().map(this::unEscape)
         .collect(Collectors.toList());
     String[] line = decoded.toArray(String[]::new);
     line[mapping.getChromIdx()] = variantContext.getContig();
@@ -88,5 +88,13 @@ public class Vcf2TsvConverter {
       line[mapping.getStopIdx()] = String.valueOf(variantContext.getStart() + length);
     }
     return line;
+  }
+
+  private String unEscape(String value) {
+    return value
+        .replace("%20", " ")
+        .replace("%2C", ",")
+        .replace("%3B", ";")
+        .replace("%3D", "=");
   }
 }

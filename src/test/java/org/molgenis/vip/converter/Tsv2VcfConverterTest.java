@@ -28,6 +28,63 @@ class Tsv2VcfConverterTest {
     VariantContext expected = builder.make();
 
     //toString because VariantContext lacks an equals method.
-    assertEquals("[MT, 2, A, other%sthing, other, CC, 3]", tsv2VcfConverter.createVariantContext(mapping, line).getAttributeAsString(LINE_ATTR,""));
+    assertEquals("[MT, 2, A, other%20thing, other, CC, 3]", tsv2VcfConverter.createVariantContext(mapping, line).getAttributeAsString(LINE_ATTR,""));
+  }
+
+  @Test
+  void createVariantContextEquals() {
+    Tsv2VcfConverter tsv2VcfConverter = new Tsv2VcfConverter();
+    String[] line = new String[]{"MT","2","A","other=thing","other","CC","3"};
+    Mapping mapping = Mapping.builder().chromIdx(0).posIdx(1).refIdx(5).altIdx(2).stopIdx(6).build();
+
+    VariantContextBuilder builder = new VariantContextBuilder();
+    builder.chr("MT");
+    builder.start(2);
+    builder.stop(3);
+    builder.attribute(LENGTH_ATTR, 1);
+    builder.alleles("CC", "A");
+    builder.attribute(LINE_ATTR, line);
+    VariantContext expected = builder.make();
+
+    //toString because VariantContext lacks an equals method.
+    assertEquals("[MT, 2, A, other%3Dthing, other, CC, 3]", tsv2VcfConverter.createVariantContext(mapping, line).getAttributeAsString(LINE_ATTR,""));
+  }
+
+  @Test
+  void createVariantContextComma() {
+    Tsv2VcfConverter tsv2VcfConverter = new Tsv2VcfConverter();
+    String[] line = new String[]{"MT","2","A","other,thing","other","CC","3"};
+    Mapping mapping = Mapping.builder().chromIdx(0).posIdx(1).refIdx(5).altIdx(2).stopIdx(6).build();
+
+    VariantContextBuilder builder = new VariantContextBuilder();
+    builder.chr("MT");
+    builder.start(2);
+    builder.stop(3);
+    builder.attribute(LENGTH_ATTR, 1);
+    builder.alleles("CC", "A");
+    builder.attribute(LINE_ATTR, line);
+    VariantContext expected = builder.make();
+
+    //toString because VariantContext lacks an equals method.
+    assertEquals("[MT, 2, A, other%2Cthing, other, CC, 3]", tsv2VcfConverter.createVariantContext(mapping, line).getAttributeAsString(LINE_ATTR,""));
+  }
+
+  @Test
+  void createVariantContextSemicolon() {
+    Tsv2VcfConverter tsv2VcfConverter = new Tsv2VcfConverter();
+    String[] line = new String[]{"MT","2","A","other;thing","other","CC","3"};
+    Mapping mapping = Mapping.builder().chromIdx(0).posIdx(1).refIdx(5).altIdx(2).stopIdx(6).build();
+
+    VariantContextBuilder builder = new VariantContextBuilder();
+    builder.chr("MT");
+    builder.start(2);
+    builder.stop(3);
+    builder.attribute(LENGTH_ATTR, 1);
+    builder.alleles("CC", "A");
+    builder.attribute(LINE_ATTR, line);
+    VariantContext expected = builder.make();
+
+    //toString because VariantContext lacks an equals method.
+    assertEquals("[MT, 2, A, other%3Bthing, other, CC, 3]", tsv2VcfConverter.createVariantContext(mapping, line).getAttributeAsString(LINE_ATTR,""));
   }
 }
