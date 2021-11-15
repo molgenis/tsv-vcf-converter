@@ -1,6 +1,10 @@
 package org.molgenis.vip.converter;
 
 import static java.lang.String.format;
+import static org.molgenis.vip.converter.model.Constants.TSV;
+import static org.molgenis.vip.converter.model.Constants.TSV_GZ;
+import static org.molgenis.vip.converter.model.Constants.VCF;
+import static org.molgenis.vip.converter.model.Constants.VCF_GZ;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,21 +36,21 @@ class AppCommandLineOptions {
             .hasArg(true)
             .required()
             .longOpt(OPT_INPUT_LONG)
-            .desc("VKGL consensus file (tsv).")
+            .desc(".tsv input file containing at least a chromosome, position, reference and alternative column.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_MAPPINGS)
             .hasArg(true)
             .required()
             .longOpt(OPT_MAPPINGS_LONG)
-            .desc("Mapping for position columns.")
+            .desc("Mapping for position columns, comma separated key=value; CHROM, POS, REF, ALT and optionally STOP.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_OUTPUT)
             .hasArg(true)
             .required()
             .longOpt(OPT_OUTPUT_LONG)
-            .desc("Output file.")
+            .desc("Output file")
             .build());
     appOptions.addOption(
         Option.builder(OPT_FORCE)
@@ -103,9 +107,9 @@ class AppCommandLineOptions {
           format("File '%s' is not readable.", inputPath.toString()));
     }
     String inputPathStr = inputPath.toString();
-    if (!inputPathStr.endsWith(".vcf") && !inputPathStr.endsWith(".tsv")) {
+    if (!(inputPathStr.endsWith(TSV) || inputPathStr.endsWith(TSV_GZ)) && !(inputPathStr.endsWith(VCF)||inputPathStr.endsWith(VCF_GZ))) {
       throw new IllegalArgumentException(
-          format("File '%s' is not a tsv or vcf file.", inputPathStr));
+          format("File '%s' is not a tsv(.gz) or vcf file(.gz).", inputPathStr));
     }
   }
 
@@ -117,7 +121,7 @@ class AppCommandLineOptions {
     Path outputPath = Path.of(commandLine.getOptionValue(OPT_OUTPUT));
 
     String outputPathStr = outputPath.toString();
-    if (!outputPathStr.endsWith(".tsv") && !outputPathStr.endsWith(".vcf")) {
+    if (!(outputPathStr.endsWith(TSV) || outputPathStr.endsWith(TSV_GZ)) && !(outputPathStr.endsWith(VCF)||outputPathStr.endsWith(VCF_GZ))) {
       throw new IllegalArgumentException(
           format("Output file '%s' is not a tsv of vcf file.", outputPathStr));
     }
