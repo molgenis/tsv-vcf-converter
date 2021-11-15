@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/molgenis/tsv-vcf-converter.svg?branch=main)](https://app.travis-ci.com/molgenis/tsv-vcf-converter)
+
 # TSV VCF Converter
 
 ##Disclaimer:
