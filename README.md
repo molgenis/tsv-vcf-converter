@@ -1,4 +1,5 @@
 [![Build Status](https://app.travis-ci.com/molgenis/tsv-vcf-converter.svg?branch=main)](https://app.travis-ci.com/molgenis/tsv-vcf-converter)
+[![Quality Status](https://sonarcloud.io/api/project_badges/measure?project=molgenis_tsv-vcf-converter&metric=alert_status)](https://sonarcloud.io/dashboard?id=molgenis_tsv-vcf-converter)
 
 # TSV VCF Converter
 
