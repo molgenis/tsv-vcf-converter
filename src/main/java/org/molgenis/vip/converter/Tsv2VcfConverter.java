@@ -61,7 +61,7 @@ public class Tsv2VcfConverter {
         writer.add(vc);
       }
     } catch (IOException | CsvValidationException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
@@ -74,11 +74,11 @@ public class Tsv2VcfConverter {
     builder.chr(line[mapping.getChromIdx()]);
     builder.start(pos);
     if (mapping.containsStop()) {
-      builder.stop(Integer.valueOf(line[mapping.getStopIdx()]));
+      builder.stop(Integer.parseInt(line[mapping.getStopIdx()]));
       builder
-          .attribute(LENGTH_ATTR, Integer.valueOf(line[mapping.getStopIdx()]) - pos);
+          .attribute(LENGTH_ATTR, Integer.parseInt(line[mapping.getStopIdx()]) - pos);
     } else {
-      builder.stop(pos + ref.length() - 1l);
+      builder.stop(pos + ref.length() - 1L);
     }
     builder.alleles(ref, alt);
     List<String> encoded = Arrays.stream(line).map(this::escape).toList();
