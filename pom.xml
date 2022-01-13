@@ -7,13 +7,13 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.3.4.RELEASE</version>
+    <version>2.6.2</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>org.molgenis</groupId>
   <artifactId>tsv-vcf-converter</artifactId>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
 
   <name>tsv-vcf-converter</name>
   <description>Tool to submit convert tsv to vcf and vice versa, written to support liftover of variant files.</description>
@@ -27,21 +27,21 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git://github.com/molgenis/TODO.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/molgenis/TODO.git
+    <connection>scm:git:git://github.com/molgenis/tsv-vcf-converter.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/molgenis/tsv-vcf-converter.git
     </developerConnection>
-    <url>https://github.com/molgenis/TODO</url>
+    <url>https://github.com/molgenis/tsv-vcf-converter</url>
   </scm>
 
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/molgenis/TODO/issues</url>
+    <url>https://github.com/molgenis/tsv-vcf-converter/issues</url>
   </issueManagement>
 
   <properties>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <commons.cli.version>1.4</commons.cli.version>
-    <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     <opencsv.version>5.2</opencsv.version>
     <samtools.htsjdk.version>2.21.3</samtools.htsjdk.version>
   </properties>
@@ -92,11 +92,6 @@
         <artifactId>htsjdk</artifactId>
         <version>${samtools.htsjdk.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-engine</artifactId>
-        <version>${junit-jupiter.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -108,7 +103,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <optional>true</optional>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -126,46 +121,39 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.junit.vintage</groupId>
-          <artifactId>junit-vintage-engine</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
     <finalName>tsv-vcf-converter</finalName>
 
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <compilerArgs>
+              <arg>-Xlint</arg>
+            </compilerArgs>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>add-resource</goal>
-            </goals>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>target/generated-resources</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- By default provided dependencies are included -->
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
