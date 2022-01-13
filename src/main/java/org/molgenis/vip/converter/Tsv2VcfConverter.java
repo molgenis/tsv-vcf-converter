@@ -60,8 +60,10 @@ public class Tsv2VcfConverter {
         VariantContext vc = createVariantContext(mapping, line);
         writer.add(vc);
       }
-    } catch (IOException | CsvValidationException e) {
-      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    } catch (CsvValidationException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 

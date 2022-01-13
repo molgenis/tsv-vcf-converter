@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class Vcf2TsvConverter {
         }
       }
     } catch (IOException ioException) {
-      ioException.printStackTrace();
+      throw new UncheckedIOException(ioException);
     }
   }
 
