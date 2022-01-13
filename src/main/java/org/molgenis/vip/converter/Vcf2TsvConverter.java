@@ -30,7 +30,7 @@ import org.molgenis.vip.converter.model.Settings;
 public class Vcf2TsvConverter {
 
   public void convert(Settings settings) {
-    try (VCFFileReader vcfFileReader = new VCFFileReader(settings.getInput(), false);) {
+    try (VCFFileReader vcfFileReader = new VCFFileReader(settings.getInput(), false)) {
       boolean isZipped = settings.getOutput().toString().endsWith(TSV_GZ);
       ICSVWriter csvWriter;
       if (isZipped) {
