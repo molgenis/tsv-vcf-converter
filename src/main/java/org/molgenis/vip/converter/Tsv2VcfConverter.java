@@ -21,7 +21,6 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFHeaderVersion;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import org.molgenis.vip.converter.model.Mapping;
 import org.molgenis.vip.converter.model.Settings;
@@ -62,11 +60,7 @@ public class Tsv2VcfConverter {
         VariantContext vc = createVariantContext(mapping, line);
         writer.add(vc);
       }
-    } catch (FileNotFoundException fileNotFoundException) {
-      fileNotFoundException.printStackTrace();
-    } catch (IOException ioException) {
-      ioException.printStackTrace();
-    } catch (CsvValidationException e) {
+    } catch (IOException | CsvValidationException e) {
       e.printStackTrace();
     }
   }
@@ -87,8 +81,7 @@ public class Tsv2VcfConverter {
       builder.stop(pos + ref.length() - 1l);
     }
     builder.alleles(ref, alt);
-    List<String> encoded = Arrays.asList(line).stream().map(this::escape).collect(
-        Collectors.toList());
+    List<String> encoded = Arrays.stream(line).map(this::escape).toList();
 
     builder.attribute(LINE_ATTR, encoded);
     return builder.make();

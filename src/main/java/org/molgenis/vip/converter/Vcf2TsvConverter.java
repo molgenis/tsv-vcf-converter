@@ -73,13 +73,13 @@ public class Vcf2TsvConverter {
   String[] parseLine(boolean isLengthPresent, VariantContext variantContext, Mapping mapping) {
     List<String> lineValue = variantContext.getAttributeAsStringList(LINE_ATTR, "");
     List<String> decoded = lineValue.stream().map(this::unEscape)
-        .collect(Collectors.toList());
+        .toList();
     String[] line = decoded.toArray(String[]::new);
     line[mapping.getChromIdx()] = variantContext.getContig();
     line[mapping.getPosIdx()] = String.valueOf(variantContext.getStart());
     line[mapping.getRefIdx()] = variantContext.getReference().getBaseString();
-    line[mapping.getAltIdx()] = String.join(",", variantContext.getAlternateAlleles().stream().map(
-        Allele::getBaseString).collect(Collectors.toList()));
+    line[mapping.getAltIdx()] = variantContext.getAlternateAlleles().stream().map(
+        Allele::getBaseString).collect(Collectors.joining(","));
     if (mapping.containsStop()) {
       if (!isLengthPresent) {
         throw new MissingLengthFieldException();

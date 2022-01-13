@@ -7,9 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.util.ResourceUtils;
 
@@ -18,52 +22,26 @@ public class AppIT {
   @TempDir
   Path sharedTempDir;
 
-  @Test
-  void test() throws IOException {
-    String inputFile = ResourceUtils.getFile("classpath:example.tsv").toString();
-    String mapping = "CHROM=chromosome,POS=start,STOP=stop,REF=ref,ALT=alt";
-    String outputFile = sharedTempDir.resolve("actual.vcf").toString();
-
-    String[] args = {"-i", inputFile, "-m", mapping, "-o", outputFile};
-    SpringApplication.run(App.class, args);
-
-    String actual = Files.readString(Path.of(outputFile));
-
-    Path expectedOutputFile = ResourceUtils.getFile("classpath:example.vcf").toPath();
-    String expected = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
-
-    assertEquals(expected, actual);
+  static Stream<Arguments> testConvertProvider() {
+    return Stream.of(Arguments.of("example.tsv", "actual.vcf", "example.vcf"),
+        Arguments.of("example.vcf", "actual.tsv", "example.tsv"),
+        Arguments.of("example.vcf.gz", "actual.tsv", "example.tsv"));
   }
 
-  @Test
-  void testReverse() throws IOException {
-    String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+  @ParameterizedTest
+  @MethodSource("testConvertProvider")
+  void testConvert(String inputPath, String outputPath, String expectedOutputPath)
+      throws IOException {
+    String inputFile = ResourceUtils.getFile("classpath:" + inputPath).toString();
     String mapping = "CHROM=chromosome,POS=start,STOP=stop,REF=ref,ALT=alt";
-    String outputFile = sharedTempDir.resolve("actual.tsv").toString();
+    String outputFile = sharedTempDir.resolve(outputPath).toString();
 
     String[] args = {"-i", inputFile, "-m", mapping, "-o", outputFile};
     SpringApplication.run(App.class, args);
 
     String actual = Files.readString(Path.of(outputFile));
 
-    Path expectedOutputFile = ResourceUtils.getFile("classpath:example.tsv").toPath();
-    String expected = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
-
-    assertEquals(expected, actual);
-  }
-
-  @Test
-  void testGzInput() throws IOException {
-    String inputFile = ResourceUtils.getFile("classpath:example.tsv.gz").toString();
-    String mapping = "CHROM=chromosome,POS=start,STOP=stop,REF=ref,ALT=alt";
-    String outputFile = sharedTempDir.resolve("actual.vcf").toString();
-
-    String[] args = {"-i", inputFile, "-m", mapping, "-o", outputFile};
-    SpringApplication.run(App.class, args);
-
-    String actual = Files.readString(Path.of(outputFile));
-
-    Path expectedOutputFile = ResourceUtils.getFile("classpath:example.vcf").toPath();
+    Path expectedOutputFile = ResourceUtils.getFile("classpath:" + expectedOutputPath).toPath();
     String expected = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
 
     assertEquals(expected, actual);
