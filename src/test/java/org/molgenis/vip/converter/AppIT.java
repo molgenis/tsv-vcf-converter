@@ -24,6 +24,7 @@ public class AppIT {
 
   static Stream<Arguments> testConvertProvider() {
     return Stream.of(Arguments.of("example.tsv", "actual.vcf", "example.vcf"),
+        Arguments.of("example.tsv.gz", "actual.vcf", "example.vcf"),
         Arguments.of("example.vcf", "actual.tsv", "example.tsv"),
         Arguments.of("example.vcf.gz", "actual.tsv", "example.tsv"));
   }
