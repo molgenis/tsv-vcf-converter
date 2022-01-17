@@ -55,7 +55,7 @@ public class AppIT {
     Path outputFile = sharedTempDir.resolve("actual.tsv.gz");
     Path outputFileUnzipped = sharedTempDir.resolve("actual.tsv");
 
-    String[] args = {"-i", inputFile, "-m", mapping, "-o", outputFile.toString()};
+    String[] args = {"-i", inputFile, "-m", mapping, "-o", outputFile.toString(), "-f"};
     SpringApplication.run(App.class, args);
     decompressGzip(outputFile, outputFileUnzipped);
     String actual = Files.readString(outputFileUnzipped);
